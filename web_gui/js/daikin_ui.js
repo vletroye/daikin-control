@@ -9,12 +9,12 @@ var sensor_response;
 var sensor_timeout;
 
 
-function request_control() {
+function request_control(ip) {
 	
-	var target="api.php";
+	var target="include/api.php";
 	var request="GET";
-	var parameters="uri=/aircon/get_control_info";
-	
+	var parameters="ip="+ip+"&uri=/aircon/get_control_info";
+		
 	var xmlhttp=new XMLHttpRequest();
 	xmlhttp.onreadystatechange  = function () {
 		if ( xmlhttp.readyState == 4 ){
@@ -24,7 +24,7 @@ function request_control() {
 				var response = JSON.parse(xmlhttp.responseText);
 				control_response=response;
 				control_response_handler(response);
-				control_timeout = setTimeout(request_control, timer);
+				control_timeout = setTimeout(function() {request_control(ip);}, timer);
 			}else{
 				console.log("Error: control ajax request failed");
 				set_alert(1,"<b>Error:</b> control ajax request failed");
@@ -41,7 +41,7 @@ function request_control() {
 }
 
 function send_control(opts){
-	var target="api.php";
+	var target="include/api.php";
 	var request="POST";
 	
 	var xmlhttp=new XMLHttpRequest();
@@ -64,11 +64,11 @@ function send_control(opts){
 		
 }
 
-function request_sensor(){
+function request_sensor(ip){
 	
-	var target="api.php";
+	var target="include/api.php";
 	var request="GET";
-	var parameters="uri=/aircon/get_sensor_info";
+	var parameters="ip="+ip+"&uri=/aircon/get_sensor_info";
 	
 	var xmlhttp=new XMLHttpRequest();
 	xmlhttp.onreadystatechange  = function () {
@@ -79,7 +79,7 @@ function request_sensor(){
 				var response = JSON.parse(xmlhttp.responseText);
 				sensor_response=response;
 				sensor_response_handler(response);
-				sensor_timeout = setTimeout(request_sensor, timer);
+				sensor_timeout = setTimeout(function() {request_sensor(ip);}, timer);
 			}else{
 				console.log("Error: sensor ajax request failed");
 				set_alert(1,"<b>Error:</b> sensor ajax request failed");
@@ -165,7 +165,7 @@ function sensor_response_handler(response){
 	set_outside_temp(parseInt(response.otemp));
 }
 
-function minimize_opt(opt){
+function minimize_opt(opt, ip){
 	var min_opt = {};
 	
 	for (var x in opt) {
@@ -179,6 +179,7 @@ function minimize_opt(opt){
     		min_opt[x] = opt[x];
     	}
    }
+   min_opt["ip"] = ip;
    
    return min_opt;
 }
@@ -187,9 +188,9 @@ function minimize_opt(opt){
 //----------ON CLICK FUNCTIONS------------
 
 
-function mode_onclick(num){
+function mode_onclick(num, ip){
 	if(!control_response) return;
-	var temp = minimize_opt(control_response);
+	var temp = minimize_opt(control_response, ip);
 	temp["mode"] = num;
 	temp["f_rate"] = control_response["dfr"+num];
 	temp["f_dir"] = control_response["dfd"+num];
@@ -200,43 +201,43 @@ function mode_onclick(num){
 		temp["stemp"] = control_response["dt"+num];
 	}
 	send_control(temp);
-	update();
+	update(ip);
 }
 
-function power_onclick(){
+function power_onclick(ip){
 	if(!control_response) return;
-	var temp = minimize_opt(control_response);
+	var temp = minimize_opt(control_response, ip);
 	temp.pow = ((temp.pow == "0") ? 1 : 0);
 	send_control(temp);
-	update();
+	update(ip);
 }
 
-function fan_onclick(level){
+function fan_onclick(level, ip){
 	if(!control_response) return;
-	var temp = minimize_opt(control_response);
+	var temp = minimize_opt(control_response, ip);
 	temp.f_rate = level;
 	send_control(temp);
-	update();
+	update(ip);
 }
 
-function wing_onclick(num){
+function wing_onclick(num, ip){
 	if(!control_response) return;
-	var temp = minimize_opt(control_response);
+	var temp = minimize_opt(control_response, ip);
 	if(num == control_response.f_dir){
 		temp.f_dir = 0;
 	}else{
 		temp.f_dir = num;
 	}
 	send_control(temp);
-	update();
+	update(ip);
 }
 
-function temp_onclick(inc){
+function temp_onclick(inc, ip){
 	if(!control_response) return;
-	var temp = minimize_opt(control_response);
+	var temp = minimize_opt(control_response, ip);
 	temp.stemp = (parseInt(control_response.stemp) + inc).toString();
 	send_control(temp);
-	update();
+	update(ip);
 }
 
 
@@ -430,18 +431,18 @@ function set_alert(boolean,mex){
 		
 	}else{
 		alert.className="alert alert-danger sr-only";
-		alert.classList.add("sr-only");
-	
+		alert.classList.add("sr-only");	
 	}
 }
 
-function update(){
+function update(ip){
+	if (ip == undefined) alert("IP not available");
 	clearTimeout(control_timeout);
 	clearTimeout(sensor_timeout);
-	if( ! request_control_loading )
-		request_control();
-	if( ! request_sensor_loading )
-		request_sensor();
+	if( ! request_control_loading ){
+		request_control(ip);
+	}
+	if( ! request_sensor_loading ) {
+		request_sensor(ip);
+	}
 }
-
-update();

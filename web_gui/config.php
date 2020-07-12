@@ -1,6 +1,7 @@
 <?php
-	//ip of the airconditioner
-	
-	$ip="192.168.1.11";
-
+if (! defined('ANTI_HACK')){exit;}
+/*****************
+ * Configuration *
+ *****************/
+$devices = '["192.168.0.30","192.168.0.31","192.168.0.32"]';
 ?>

@@ -1,10 +1,9 @@
 <?php
 require "engine.php";
-require "config.php";
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
 	$aRequest = json_decode(file_get_contents('php://input'), true);
-   $json_ret = set_array_info("/aircon/set_control_info",$ip,$aRequest);
+   $json_ret = set_array_info("/aircon/set_control_info",$aRequest);
    //request failed
    if($json_ret===FALSE){
 	   http_response_code(503); //service Unavailable 
@@ -22,7 +21,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 		exit;
 	}
 	
-	$json_info=get_json_info($_GET["uri"],$ip);
+	$json_info=get_json_info($_GET["uri"],$_GET["ip"]);
 	//request failed
 	if($json_info===FALSE){
 		http_response_code(503); //service Unavailable 

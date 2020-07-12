@@ -27,7 +27,10 @@ function get_json_info($uri,$aircon_ip){
 }
 
 
-function set_array_info($uri,$aircon_ip,$parameters){
+function set_array_info($uri,$parameters){
+	$aircon_ip=$parameters["ip"];
+	$parameters= array_diff_key($parameters, array("ip" => ""));
+	
 	$url= "http://$aircon_ip$uri";
 	$context= stream_context_create(NULL,$parameters);
 	$data= file_get_contents ( $url . '?' . http_build_query($parameters));
