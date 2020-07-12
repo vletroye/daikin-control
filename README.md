@@ -3,8 +3,10 @@ Daikin-Control
 
 ![Web Gui Preview](https://raw.githubusercontent.com/vletroye/daikin-control/master/web_gui.png)
 
-The '''Daikin Emura FTXG-L''' air conditioner comes with a wifi module preinstalled that allows you to control it via internet.
-The solution provided by Daikin is a mobile app (very well designed) that allows you to control the air conditioner even remotely, exploiting the REST API of the wifi module.
+This project is a fork of [ael-code](https://github.com/ael-code/daikin-control)
+
+Various '''Daikin''' air conditioners support wifi modules (sometimes preinstalled) that allows you to controlthem via internet.
+The solution provided by Daikin is a mobile app (very well designed) that allows you to control the air conditioners remotely, exploiting the REST API of the wifi module.
 
 Even if the system works, there are some problems:
 
@@ -12,18 +14,17 @@ Even if the system works, there are some problems:
 - To control your AC remotely from outside your lan, your requests must go through the Daikin server. The device response is slow because the system is based on polling request. (you can't set the ip of the AC on the mobile application)
 - Even if the remote management system involves the use of an account with password, there is a big security issue, password and username can be accessed from inside your LAN with a GET request. (try basic_info request)
 
+The project of ael-code aimed to provide 2 main things:
 
-This project aims to provide 2 main things:
+- an **unoffcial documentation** of Daikin API needed to control the air conditioner
+- a **web interface** to manage air conditioner settings
 
-- **unoffcial documentation** of Daikin API needed to control the air conditioner
-- **web interface** to manage air conditioner settings
-
+This projet adds a configuration page searching for all devices available on a subnetwork (by defaul, the one of the web serveur runing the application).
+Next, ael-code's webpage (with daiking controls) is diplayed for each device in a dedicated iframe.
 
 ## Tested Hardware
 
-The API described by this document have been tested and seems to be working with firmware version from `1.4.3` to `3.3.1`.
-
-The following hardware configurations have been used for testing:
+The API of ael-code has been tested with firmware version from `1.4.3` to `3.3.6` on the following hardware configurations:
 
 ```
 ModelName:          Daikin Emura FTXG-L
@@ -43,15 +44,24 @@ ModelID:            FTXTM302V1B
 WifiControllerID:   BRP069B41
 Software version:   1.2.51
 ```
-
-If you try new hardware configurations or new firmware versions, please contact me.
-
+```
+ModelName:          Daikin Perfera FTXM-N
+ModelID:            FTXM35N2V1B and FTXM25N2V1B
+WifiControllerID:   BRP069B41
+Software version:   1.2.51
+```
+```
+ModelName:          Daikin Round Flow FCAG-B
+ModelID:            FCAG71BVEB
+WifiControllerID:   BRP069A42
+Software version:   3.3.6
+```
 
 ## API System
 
 Daikin original API use REST.
 
-You can use GET http request to retrive informations and POST http request to apply new settings.
+You can use GET http request to retreive informations and POST http request to apply new settings.
 
 Uri                | GET | POST | desc
 -------------------|-----|------|-----
