@@ -10,6 +10,7 @@ var sensor_timeout;
 
 
 function request_control(ip) {
+	clearTimeout(control_timeout);
 	
 	var target="include/api.php";
 	var request="GET";
@@ -24,10 +25,12 @@ function request_control(ip) {
 				var response = JSON.parse(xmlhttp.responseText);
 				control_response=response;
 				control_response_handler(response);
+				set_alert(0,"");
 				control_timeout = setTimeout(function() {request_control(ip);}, timer);
 			}else{
 				console.log("Error: control ajax request failed");
 				set_alert(1,"<b>Error:</b> control ajax request failed");
+				control_timeout = setTimeout(function() {request_control(ip);}, timer);
 			}
 		}else{
 			//alert(xmlhttp.readyState);
@@ -65,7 +68,8 @@ function send_control(opts){
 }
 
 function request_sensor(ip){
-	
+	clearTimeout(sensor_timeout);
+
 	var target="include/api.php";
 	var request="GET";
 	var parameters="ip="+ip+"&uri=/aircon/get_sensor_info";
@@ -79,10 +83,12 @@ function request_sensor(ip){
 				var response = JSON.parse(xmlhttp.responseText);
 				sensor_response=response;
 				sensor_response_handler(response);
+				set_alert(0,"");
 				sensor_timeout = setTimeout(function() {request_sensor(ip);}, timer);
 			}else{
 				console.log("Error: sensor ajax request failed");
 				set_alert(1,"<b>Error:</b> sensor ajax request failed");
+				sensor_timeout = setTimeout(function() {request_sensor(ip);}, timer);
 			}
 		}else{
 			
@@ -427,8 +433,7 @@ function set_alert(boolean,mex){
 	if(boolean){
 		alert.classList.remove("sr-only")
 		alert.className="alert alert-danger";
-		alert.lastElementChild.innerHTML=mex;
-		
+		alert.lastElementChild.innerHTML=mex;		
 	}else{
 		alert.className="alert alert-danger sr-only";
 		alert.classList.add("sr-only");	
